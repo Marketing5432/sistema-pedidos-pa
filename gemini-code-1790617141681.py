@@ -51,15 +51,23 @@ def obtener_datos_google():
     except Exception as e:
         st.error(f"Error al leer la hoja de cálculo: {e}")
         return None, None
-
+        
 # --- 3. GENERAR IMAGEN ---
 def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     imagen = Image.open(ruta_imagen_base)
     dibujo = ImageDraw.Draw(imagen)
+    
+    # Intentamos forzar fuentes grandes
     try:
-        fuente = ImageFont.truetype("arial.ttf", 45)
+        # Si subiste el archivo a GitHub, usará este tamaño 70
+        fuente = ImageFont.truetype("arial.ttf", 70)
     except:
-        fuente = ImageFont.load_default()
+        try:
+            # Fuente genérica por si acaso
+            fuente = ImageFont.truetype("DejaVuSans.ttf", 70)
+        except:
+            # Si falla, usa la pequeña
+            fuente = ImageFont.load_default()
 
     coordenadas = {
         "NEA": {"P2": (180, 280), "P1": (430, 280), "SOPAS": (700, 280)},
@@ -67,7 +75,10 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
         "CLEMONT SHOWROOM": {"P2": (180, 680), "P1": (430, 680), "SOPAS": (700, 680)},
         "CLEMONT CEDI": {"P2": (180, 880), "P1": (430, 880), "SOPAS": (700, 880)}
     }
-    color_texto = (0, 0, 0)
+    
+    # COLOR ROJO (Para encontrar dónde están cayendo los números)
+    color_texto = (255, 0, 0) 
+    
     for sede, categorias in coordenadas.items():
         if sede in datos_pedidos:
             dibujo.text(categorias["P2"], str(datos_pedidos[sede]["P2"]), fill=color_texto, font=fuente)
@@ -77,6 +88,7 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     buf = io.BytesIO()
     imagen.save(buf, format="JPEG")
     return buf.getvalue()
+
 
 # --- 4. INTERFAZ WEB ---
 datos_procesados, df_crudo = obtener_datos_google()
