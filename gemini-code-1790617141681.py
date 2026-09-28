@@ -68,7 +68,7 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
         "NEA":              {"P2": (ancho * 0.21, alto * 0.29), "P1": (ancho * 0.50, alto * 0.29), "SOPAS": (ancho * 0.81, alto * 0.29)},
         "MONASTERY":        {"P2": (ancho * 0.21, alto * 0.45), "P1": (ancho * 0.50, alto * 0.45), "SOPAS": (ancho * 0.81, alto * 0.45)},
         "CLEMONT SHOWROOM": {"P2": (ancho * 0.21, alto * 0.61), "P1": (ancho * 0.50, alto * 0.61), "SOPAS": (ancho * 0.81, alto * 0.61)},
-        "CLEMONT CEDI":     {"P2": (ancho * 0.21, alto * 0.77), "P1": (ancho * 0.50, alto * 0.77), "SOPAS": (ancho * 0.81, alto * 0.77)}
+        "CLEMONT CEDI":     {"P2": (ancho * 0.21, alto * 0.81), "P1": (ancho * 0.50, alto * 0.81), "SOPAS": (ancho * 0.81, alto * 0.81)}
     }
     
     color_texto = (0, 0, 0) # Negro
