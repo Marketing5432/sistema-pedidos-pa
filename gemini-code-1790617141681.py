@@ -10,7 +10,7 @@ st.title("Panel de Control - Pedidos PA 🍲")
 # Hemos quitado el caché para que siempre lea los datos más frescos al instante
 def obtener_datos_google():
     try:
-        URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQVsIelpOXv6q2gXZYtkkY_QrjMtaRTIqLR1IdZHYONAlsL4TEEMHIQ9a_CpTOd_m3m35xx2YEHih3h/pub?gid=690889630&single=true&output=csv" 
+        URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmR3f2NpHbmtE_FLibPWnnrOC4zODWLK9boy0Oer1UtiPpZMo9ph77AsOJWJaeHBcjNC_nLnwcgXQV/pub?gid=698961945&single=true&output=csv" 
         
         df = pd.read_csv(URL_CSV)
         
