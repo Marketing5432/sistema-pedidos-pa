@@ -2,21 +2,23 @@ import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import io
 import pandas as pd
+import urllib.request
 
 st.set_page_config(page_title="Productora de Alimentos PA", layout="centered")
 st.title("Panel de Control - Pedidos PA 🍲")
 
-# --- 1. CONECTAR A GOOGLE SHEETS (MÉTODO CSV) ---
+# --- PEGA AQUÍ TUS DOS ENLACES ---
+URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQVsIelpOXv6q2gXZYtkkY_QrjMtaRTIqLR1IdZHYONAlsL4TEEMHIQ9a_CpTOd_m3m35xx2YEHih3h/pub?gid=690889630&single=true&output=csv"
+URL_BORRAR = "PEGA_AQUÍ_LA_URL_DE_LA_APLICACION_WEB_DE_APPS_SCRIPT"
+
+# --- 1. CONECTAR A GOOGLE SHEETS ---
 def obtener_datos_google():
     try:
-        URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmR3f2NpHbmtE_FLibPWnnrOC4zODWLK9boy0Oer1UtiPpZMo9ph77AsOJWJaeHBcjNC_nLnwcgXQV/pub?gid=698961945&single=true&output=csv" 
         df = pd.read_csv(URL_CSV)
-        
         if df.empty:
             return None, None
             
         df.columns = df.columns.str.strip().str.upper()
-
         COLUMNA_SEDE = "SEDE" 
         COLUMNA_PROTEINA = "MENU" 
         COLUMNA_SOPA = "SOPA" 
@@ -38,7 +40,6 @@ def obtener_datos_google():
                     resumen[sede]["P1"] += 1
                 elif "2" in proteina:
                     resumen[sede]["P2"] += 1
-                
                 if sopa == "SÍ" or sopa == "SI" or sopa == "YES":
                     resumen[sede]["SOPAS"] += 1
                     
@@ -83,17 +84,34 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     imagen.save(buf, format="JPEG")
     return buf.getvalue()
 
-# --- 4. INTERFAZ WEB ---
+# --- 3. INTERFAZ WEB ---
 datos_procesados, df_crudo = obtener_datos_google()
 
 if datos_procesados:
-    st.success("✅ Conectado a Google Sheets exitosamente")
+    st.success("✅ Sistema Enlazado Correctamente")
     
+    # --- SECCIÓN DE ADMINISTRACIÓN (BORRAR DATOS) ---
+    with st.expander("⚙️ Administrar Sistema (Reiniciar Día)"):
+        st.warning("⚠️ Al presionar este botón, se borrarán de forma permanente todos los pedidos actuales en tu hoja de Google Sheets para empezar un día nuevo.")
+        if st.button("🗑️ Borrar todos los pedidos y reiniciar en Cero"):
+            try:
+                # Se comunica con el Apps Script
+                url_limpiar = URL_BORRAR + "?accion=borrar"
+                respuesta = urllib.request.urlopen(url_limpiar).read().decode('utf-8')
+                
+                if "Exito" in respuesta:
+                    st.success("¡Datos borrados exitosamente! Actualiza la página para ver los contadores en cero.")
+                    st.rerun() # Recarga la página automáticamente
+                else:
+                    st.error("No se pudo borrar. Asegúrate de haber pegado bien la URL de Apps Script.")
+            except Exception as e:
+                st.error(f"Error al intentar comunicarse con Google: {e}")
+
+    # --- SECCIÓN NORMAL ---
+    st.write("### Resumen de Pedidos Actuales")
     if st.button("🔄 Actualizar Datos Ahora"):
         st.rerun()
-
-    st.write("### Resumen de Pedidos Actuales")
-    
+        
     df_resumen = pd.DataFrame(datos_procesados).T
     st.dataframe(df_resumen)
     
