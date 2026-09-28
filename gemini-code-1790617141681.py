@@ -7,20 +7,16 @@ st.set_page_config(page_title="Productora de Alimentos PA", layout="centered")
 st.title("Panel de Control - Pedidos PA 🍲")
 
 # --- 1. CONECTAR A GOOGLE SHEETS (MÉTODO CSV) ---
-# Hemos quitado el caché para que siempre lea los datos más frescos al instante
 def obtener_datos_google():
     try:
         URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmR3f2NpHbmtE_FLibPWnnrOC4zODWLK9boy0Oer1UtiPpZMo9ph77AsOJWJaeHBcjNC_nLnwcgXQV/pub?gid=698961945&single=true&output=csv" 
-        
         df = pd.read_csv(URL_CSV)
         
         if df.empty:
             return None, None
             
-        # SOLUCIÓN: Limpiamos los títulos de las columnas (quitamos espacios invisibles y forzamos mayúsculas)
         df.columns = df.columns.str.strip().str.upper()
 
-        # Al estar limpios, podemos buscarlos con seguridad
         COLUMNA_SEDE = "SEDE" 
         COLUMNA_PROTEINA = "MENU" 
         COLUMNA_SOPA = "SOPA" 
@@ -32,7 +28,6 @@ def obtener_datos_google():
             "CLEMONT CEDI": {"P2": 0, "P1": 0, "SOPAS": 0}
         }
 
-        # Contar los pedidos
         for index, fila in df.iterrows():
             sede = str(fila.get(COLUMNA_SEDE, "")).strip().upper()
             proteina = str(fila.get(COLUMNA_PROTEINA, "")).strip().upper()
@@ -59,15 +54,12 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     
     ancho, alto = imagen.size
     
-    # Descargar fuente Roboto Black directamente de Google
+    # El tamaño de la letra será proporcional al tamaño de tu imagen
+    tamano_letra = int(ancho * 0.04) 
+    
+    # Usar la fuente Arial que subiste
     try:
-        url_fuente = "https://github.com/googlefonts/roboto/raw/main/src/hinted/Roboto-Black.ttf"
-        req = urllib.request.Request(url_fuente, headers={'User-Agent': 'Mozilla/5.0'})
-        res = urllib.request.urlopen(req)
-        
-        # El tamaño de la letra será el 4% del ancho de la imagen (gigante y proporcional)
-        tamano_letra = int(ancho * 0.04) 
-        fuente = ImageFont.truetype(io.BytesIO(res.read()), tamano_letra)
+        fuente = ImageFont.truetype("arial.ttf", tamano_letra)
     except:
         fuente = ImageFont.load_default()
 
@@ -90,7 +82,6 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     buf = io.BytesIO()
     imagen.save(buf, format="JPEG")
     return buf.getvalue()
-    
 
 # --- 4. INTERFAZ WEB ---
 datos_procesados, df_crudo = obtener_datos_google()
@@ -98,7 +89,6 @@ datos_procesados, df_crudo = obtener_datos_google()
 if datos_procesados:
     st.success("✅ Conectado a Google Sheets exitosamente")
     
-    # Botón para forzar recarga manual de datos
     if st.button("🔄 Actualizar Datos Ahora"):
         st.rerun()
 
@@ -109,7 +99,7 @@ if datos_procesados:
     
     st.write("---")
     st.write("### Generar Imagen para Cocina")
-    nombre_archivo_base = "menu3 322-07 22-01.jpg"
+    nombre_archivo_base = "menu3 322-07 22-01.jpg" 
     
     try:
         imagen_bytes = generar_imagen_bytes(datos_procesados, nombre_archivo_base)
