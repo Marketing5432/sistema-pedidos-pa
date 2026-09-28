@@ -7,20 +7,20 @@ st.set_page_config(page_title="Productora de Alimentos PA", layout="centered")
 st.title("Panel de Control - Pedidos PA 🍲")
 
 # --- 1. CONECTAR A GOOGLE SHEETS (MÉTODO CSV) ---
-@st.cache_data(ttl=60) # Actualiza los datos cada 60 segundos
+# Hemos quitado el caché para que siempre lea los datos más frescos al instante
 def obtener_datos_google():
     try:
-        # AQUÍ ESTÁ TU ENLACE REAL CONECTADO
         URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQVsIelpOXv6q2gXZYtkkY_QrjMtaRTIqLR1IdZHYONAlsL4TEEMHIQ9a_CpTOd_m3m35xx2YEHih3h/pub?gid=690889630&single=true&output=csv" 
         
-        # Leemos los datos directamente del enlace
         df = pd.read_csv(URL_CSV)
         
         if df.empty:
             return None, None
             
-        # --- 2. ORGANIZAR LOS DATOS ---
-        # Nombres exactos basados en la imagen de tu Google Sheets
+        # SOLUCIÓN: Limpiamos los títulos de las columnas (quitamos espacios invisibles y forzamos mayúsculas)
+        df.columns = df.columns.str.strip().str.upper()
+
+        # Al estar limpios, podemos buscarlos con seguridad
         COLUMNA_SEDE = "SEDE" 
         COLUMNA_PROTEINA = "MENU" 
         COLUMNA_SOPA = "SOPA" 
@@ -83,6 +83,11 @@ datos_procesados, df_crudo = obtener_datos_google()
 
 if datos_procesados:
     st.success("✅ Conectado a Google Sheets exitosamente")
+    
+    # Botón para forzar recarga manual de datos
+    if st.button("🔄 Actualizar Datos Ahora"):
+        st.rerun()
+
     st.write("### Resumen de Pedidos Actuales")
     
     df_resumen = pd.DataFrame(datos_procesados).T
