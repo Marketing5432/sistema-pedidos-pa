@@ -51,33 +51,35 @@ def obtener_datos_google():
     except Exception as e:
         st.error(f"Error al leer la hoja de cálculo: {e}")
         return None, None
-        
-# --- 3. GENERAR IMAGEN ---
+
+# --- 3. GENERAR IMAGEN INTELIGENTE ---
 def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     imagen = Image.open(ruta_imagen_base)
     dibujo = ImageDraw.Draw(imagen)
     
-    # Intentamos forzar fuentes grandes
+    ancho, alto = imagen.size
+    
+    # Descargar fuente Roboto Black directamente de Google
     try:
-        # Si subiste el archivo a GitHub, usará este tamaño 70
-        fuente = ImageFont.truetype("arial.ttf", 70)
+        url_fuente = "https://github.com/googlefonts/roboto/raw/main/src/hinted/Roboto-Black.ttf"
+        req = urllib.request.Request(url_fuente, headers={'User-Agent': 'Mozilla/5.0'})
+        res = urllib.request.urlopen(req)
+        
+        # El tamaño de la letra será el 4% del ancho de la imagen (gigante y proporcional)
+        tamano_letra = int(ancho * 0.04) 
+        fuente = ImageFont.truetype(io.BytesIO(res.read()), tamano_letra)
     except:
-        try:
-            # Fuente genérica por si acaso
-            fuente = ImageFont.truetype("DejaVuSans.ttf", 70)
-        except:
-            # Si falla, usa la pequeña
-            fuente = ImageFont.load_default()
+        fuente = ImageFont.load_default()
 
+    # Coordenadas por porcentajes matemáticos (X, Y)
     coordenadas = {
-        "NEA": {"P2": (180, 280), "P1": (430, 280), "SOPAS": (700, 280)},
-        "MONASTERY": {"P2": (180, 480), "P1": (430, 480), "SOPAS": (700, 480)},
-        "CLEMONT SHOWROOM": {"P2": (180, 680), "P1": (430, 680), "SOPAS": (700, 680)},
-        "CLEMONT CEDI": {"P2": (180, 880), "P1": (430, 880), "SOPAS": (700, 880)}
+        "NEA":              {"P2": (ancho * 0.21, alto * 0.29), "P1": (ancho * 0.50, alto * 0.29), "SOPAS": (ancho * 0.81, alto * 0.29)},
+        "MONASTERY":        {"P2": (ancho * 0.21, alto * 0.45), "P1": (ancho * 0.50, alto * 0.45), "SOPAS": (ancho * 0.81, alto * 0.45)},
+        "CLEMONT SHOWROOM": {"P2": (ancho * 0.21, alto * 0.61), "P1": (ancho * 0.50, alto * 0.61), "SOPAS": (ancho * 0.81, alto * 0.61)},
+        "CLEMONT CEDI":     {"P2": (ancho * 0.21, alto * 0.77), "P1": (ancho * 0.50, alto * 0.77), "SOPAS": (ancho * 0.81, alto * 0.77)}
     }
     
-    # COLOR ROJO (Para encontrar dónde están cayendo los números)
-    color_texto = (255, 0, 0) 
+    color_texto = (0, 0, 0) # Negro
     
     for sede, categorias in coordenadas.items():
         if sede in datos_pedidos:
@@ -88,7 +90,7 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     buf = io.BytesIO()
     imagen.save(buf, format="JPEG")
     return buf.getvalue()
-
+    
 
 # --- 4. INTERFAZ WEB ---
 datos_procesados, df_crudo = obtener_datos_google()
