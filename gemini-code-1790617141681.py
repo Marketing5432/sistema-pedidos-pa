@@ -8,8 +8,8 @@ st.set_page_config(page_title="Productora de Alimentos PA", layout="centered")
 st.title("Panel de Control - Pedidos PA 🍲")
 
 # --- PEGA AQUÍ TUS DOS ENLACES ---
-URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQVsIelpOXv6q2gXZYtkkY_QrjMtaRTIqLR1IdZHYONAlsL4TEEMHIQ9a_CpTOd_m3m35xx2YEHih3h/pub?gid=690889630&single=true&output=csv"
-URL_BORRAR = "PEGA_AQUÍ_LA_URL_DE_LA_APLICACION_WEB_DE_APPS_SCRIPT"
+URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmR3f2NpHbmtE_FLibPWnnrOC4zODWLK9boy0Oer1UtiPpZMo9ph77AsOJWJaeHBcjNC_nLnwcgXQV/pub?gid=698961945&single=true&output=csv"
+URL_BORRAR = "https://script.google.com/macros/s/AKfycbzTSoQjqxaYQUtRyNFPhF8FLWoxcB4JNgiPN_Nuoq973qqzkruLfCF0EXBHEN6BFXpPfQ/exec"
 
 # --- 1. CONECTAR A GOOGLE SHEETS ---
 def obtener_datos_google():
