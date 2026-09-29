@@ -2,14 +2,12 @@ import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import io
 import pandas as pd
-import urllib.request
 
 st.set_page_config(page_title="Productora de Alimentos PA", layout="centered")
 st.title("Panel de Control - Pedidos PA 🍲")
 
-# --- PEGA AQUÍ TUS DOS ENLACES ---
+# --- PEGA AQUÍ TU ENLACE ---
 URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmR3f2NpHbmtE_FLibPWnnrOC4zODWLK9boy0Oer1UtiPpZMo9ph77AsOJWJaeHBcjNC_nLnwcgXQV/pub?gid=698961945&single=true&output=csv"
-URL_BORRAR = "https://script.google.com/macros/s/AKfycbzTSoQjqxaYQUtRyNFPhF8FLWoxcB4JNgiPN_Nuoq973qqzkruLfCF0EXBHEN6BFXpPfQ/exec"
 
 # --- 1. CONECTAR A GOOGLE SHEETS ---
 def obtener_datos_google():
@@ -48,7 +46,7 @@ def obtener_datos_google():
         st.error(f"Error al leer la hoja de cálculo: {e}")
         return None, None
 
-# --- 3. GENERAR IMAGEN INTELIGENTE ---
+# --- 2. GENERAR IMAGEN INTELIGENTE ---
 def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     imagen = Image.open(ruta_imagen_base)
     dibujo = ImageDraw.Draw(imagen)
@@ -58,7 +56,6 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     # El tamaño de la letra será proporcional al tamaño de tu imagen
     tamano_letra = int(ancho * 0.04) 
     
-    # Usar la fuente Arial que subiste
     try:
         fuente = ImageFont.truetype("arial.ttf", tamano_letra)
     except:
@@ -72,7 +69,7 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
         "CLEMONT CEDI":     {"P2": (ancho * 0.21, alto * 0.81), "P1": (ancho * 0.50, alto * 0.81), "SOPAS": (ancho * 0.81, alto * 0.81)}
     }
     
-    color_texto = (0, 0, 0) # Negro
+    color_texto = (0, 0, 0) 
     
     for sede, categorias in coordenadas.items():
         if sede in datos_pedidos:
@@ -90,35 +87,6 @@ datos_procesados, df_crudo = obtener_datos_google()
 if datos_procesados:
     st.success("✅ Sistema Enlazado Correctamente")
     
-function archivarYBorrar() {
-  var libro = SpreadsheetApp.getActiveSpreadsheet();
-  var hojaPrincipal = libro.getSheets()[0]; // Tu hoja de pedidos de hoy
-  
-  // 1. Busca o crea la pestaña "Archivo"
-  var hojaArchivo = libro.getSheetByName("Archivo");
-  if (!hojaArchivo) {
-    hojaArchivo = libro.insertSheet("Archivo");
-    var encabezados = hojaPrincipal.getRange(1, 1, 1, hojaPrincipal.getLastColumn()).getValues();
-    hojaArchivo.appendRow(encabezados[0]);
-  }
-  
-  var ultimaFila = hojaPrincipal.getLastRow();
-  
-  if (ultimaFila > 1) {
-    // 2. Copia los pedidos y los pega en "Archivo"
-    var rangoDatos = hojaPrincipal.getRange(2, 1, ultimaFila - 1, hojaPrincipal.getLastColumn());
-    var valores = rangoDatos.getValues();
-    
-    var ultimaFilaArchivo = Math.max(hojaArchivo.getLastRow(), 1);
-    hojaArchivo.getRange(ultimaFilaArchivo + 1, 1, valores.length, valores[0].length).setValues(valores);
-    
-    // 3. Borra los pedidos de la hoja principal (limpia el día)
-    hojaPrincipal.deleteRows(2, ultimaFila - 1);
-  }
-}
-
-
-    # --- SECCIÓN NORMAL ---
     st.write("### Resumen de Pedidos Actuales")
     if st.button("🔄 Actualizar Datos Ahora"):
         st.rerun()
