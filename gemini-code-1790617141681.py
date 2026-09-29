@@ -6,8 +6,9 @@ import pandas as pd
 st.set_page_config(page_title="Productora de Alimentos PA", layout="centered")
 st.title("Panel de Control - Pedidos PA 🍲")
 
-# --- PEGA AQUÍ TU ENLACE ---
+# --- TUS DOS ENLACES ESTÁN AQUÍ CONECTADOS ---
 URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmR3f2NpHbmtE_FLibPWnnrOC4zODWLK9boy0Oer1UtiPpZMo9ph77AsOJWJaeHBcjNC_nLnwcgXQV/pub?gid=698961945&single=true&output=csv"
+URL_WEB_APP = "https://script.google.com/a/macros/productoradealimentos.com/s/AKfycby1FBBVkQg-lNhPCRvvKrvN6EYsGPFsVPekDPVf3J951HSDbGFWFwZc0lowgeknIiKo/exec" 
 
 # --- 1. CONECTAR A GOOGLE SHEETS ---
 def obtener_datos_google():
@@ -50,18 +51,13 @@ def obtener_datos_google():
 def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     imagen = Image.open(ruta_imagen_base)
     dibujo = ImageDraw.Draw(imagen)
-    
     ancho, alto = imagen.size
-    
-    # El tamaño de la letra será proporcional al tamaño de tu imagen
     tamano_letra = int(ancho * 0.04) 
-    
     try:
         fuente = ImageFont.truetype("arial.ttf", tamano_letra)
     except:
         fuente = ImageFont.load_default()
 
-    # Coordenadas por porcentajes matemáticos (X, Y)
     coordenadas = {
         "NEA":              {"P2": (ancho * 0.21, alto * 0.29), "P1": (ancho * 0.50, alto * 0.29), "SOPAS": (ancho * 0.81, alto * 0.29)},
         "MONASTERY":        {"P2": (ancho * 0.21, alto * 0.45), "P1": (ancho * 0.50, alto * 0.45), "SOPAS": (ancho * 0.81, alto * 0.45)},
@@ -70,7 +66,6 @@ def generar_imagen_bytes(datos_pedidos, ruta_imagen_base):
     }
     
     color_texto = (0, 0, 0) 
-    
     for sede, categorias in coordenadas.items():
         if sede in datos_pedidos:
             dibujo.text(categorias["P2"], str(datos_pedidos[sede]["P2"]), fill=color_texto, font=fuente)
@@ -87,6 +82,13 @@ datos_procesados, df_crudo = obtener_datos_google()
 if datos_procesados:
     st.success("✅ Sistema Enlazado Correctamente")
     
+    # --- BOTÓN DE ARCHIVAR (MÉTODO SEGURO) ---
+    with st.expander("⚙️ Administrar Sistema (Archivar Día)"):
+        st.warning("⚠️ Al presionar este botón, los pedidos de hoy se guardarán en el historial (Archivo) y esta pantalla quedará en cero para el nuevo día.")
+        
+        # st.link_button abre una pestaña segura en tu navegador. ¡Evita el bloqueo de la cuenta empresa!
+        st.link_button("🗄️ Archivar todos los pedidos y reiniciar", URL_WEB_APP + "?accion=archivar", type="primary")
+
     st.write("### Resumen de Pedidos Actuales")
     if st.button("🔄 Actualizar Datos Ahora"):
         st.rerun()
