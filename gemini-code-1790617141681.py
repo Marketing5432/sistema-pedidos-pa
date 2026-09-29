@@ -8,7 +8,7 @@ st.title("Panel de Control - Pedidos PA 🍲")
 
 # --- TUS DOS ENLACES ESTÁN AQUÍ CONECTADOS ---
 URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmR3f2NpHbmtE_FLibPWnnrOC4zODWLK9boy0Oer1UtiPpZMo9ph77AsOJWJaeHBcjNC_nLnwcgXQV/pub?gid=698961945&single=true&output=csv"
-URL_WEB_APP = "https://script.google.com/a/macros/productoradealimentos.com/s/AKfycby1FBBVkQg-lNhPCRvvKrvN6EYsGPFsVPekDPVf3J951HSDbGFWFwZc0lowgeknIiKo/exec" 
+URL_WEB_APP = "https://script.google.com/macros/s/AKfycby1FBBVkQg-lNhPCRvvKrvN6EYsGPFsVPekDPVf3J951HSDbGFWFwZc0lowgeknIiKo/exec" 
 
 # --- 1. CONECTAR A GOOGLE SHEETS ---
 def obtener_datos_google():
@@ -86,7 +86,7 @@ if datos_procesados:
     with st.expander("⚙️ Administrar Sistema (Archivar Día)"):
         st.warning("⚠️ Al presionar este botón, los pedidos de hoy se guardarán en el historial (Archivo) y esta pantalla quedará en cero para el nuevo día.")
         
-        # st.link_button abre una pestaña segura en tu navegador. ¡Evita el bloqueo de la cuenta empresa!
+        # st.link_button abre una pestaña segura en tu navegador.
         st.link_button("🗄️ Archivar todos los pedidos y reiniciar", URL_WEB_APP + "?accion=archivar", type="primary")
 
     st.write("### Resumen de Pedidos Actuales")
