@@ -90,22 +90,33 @@ datos_procesados, df_crudo = obtener_datos_google()
 if datos_procesados:
     st.success("✅ Sistema Enlazado Correctamente")
     
-    # --- SECCIÓN DE ADMINISTRACIÓN (BORRAR DATOS) ---
-    with st.expander("⚙️ Administrar Sistema (Reiniciar Día)"):
-        st.warning("⚠️ Al presionar este botón, se borrarán de forma permanente todos los pedidos actuales en tu hoja de Google Sheets para empezar un día nuevo.")
-        if st.button("🗑️ Borrar todos los pedidos y reiniciar en Cero"):
-            try:
-                # Se comunica con el Apps Script
-                url_limpiar = URL_BORRAR + "?accion=borrar"
-                respuesta = urllib.request.urlopen(url_limpiar).read().decode('utf-8')
-                
-                if "Exito" in respuesta:
-                    st.success("¡Datos borrados exitosamente! Actualiza la página para ver los contadores en cero.")
-                    st.rerun() # Recarga la página automáticamente
-                else:
-                    st.error("No se pudo borrar. Asegúrate de haber pegado bien la URL de Apps Script.")
-            except Exception as e:
-                st.error(f"Error al intentar comunicarse con Google: {e}")
+function archivarYBorrar() {
+  var libro = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaPrincipal = libro.getSheets()[0]; // Tu hoja de pedidos de hoy
+  
+  // 1. Busca o crea la pestaña "Archivo"
+  var hojaArchivo = libro.getSheetByName("Archivo");
+  if (!hojaArchivo) {
+    hojaArchivo = libro.insertSheet("Archivo");
+    var encabezados = hojaPrincipal.getRange(1, 1, 1, hojaPrincipal.getLastColumn()).getValues();
+    hojaArchivo.appendRow(encabezados[0]);
+  }
+  
+  var ultimaFila = hojaPrincipal.getLastRow();
+  
+  if (ultimaFila > 1) {
+    // 2. Copia los pedidos y los pega en "Archivo"
+    var rangoDatos = hojaPrincipal.getRange(2, 1, ultimaFila - 1, hojaPrincipal.getLastColumn());
+    var valores = rangoDatos.getValues();
+    
+    var ultimaFilaArchivo = Math.max(hojaArchivo.getLastRow(), 1);
+    hojaArchivo.getRange(ultimaFilaArchivo + 1, 1, valores.length, valores[0].length).setValues(valores);
+    
+    // 3. Borra los pedidos de la hoja principal (limpia el día)
+    hojaPrincipal.deleteRows(2, ultimaFila - 1);
+  }
+}
+
 
     # --- SECCIÓN NORMAL ---
     st.write("### Resumen de Pedidos Actuales")
